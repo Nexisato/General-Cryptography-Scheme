@@ -14,12 +14,15 @@ include_directories(
 
 set(ACCUMULATOR_PART
     src/utils.cpp
+    src/base.cpp
     src/accumulator.cpp
     test/test_acc.cpp
 )
 
 set(ECC_PART 
     src/utils.cpp
+    src/base.cpp
+    src/kgc.cpp
     test/test_ecc.cpp
 )
 

@@ -2,14 +2,14 @@
  * @Author: nexisato
  * @Date: 2024-02-27 19:30:53
  * @FilePath: /miracl_validation/include/accumulator.h
- * @Description: 密码累加器的定义
+ * @Description: 密码学累加器的定义
  * @
  */
 #pragma once
 
-#include "miracl/big.h"
+#include "base.h"
 #include "utils.h"
-#include "miracl/miracl.h"
+
 #include <fstream>
 #include <iostream>
 #include <vector>

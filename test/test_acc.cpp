@@ -1,15 +1,14 @@
 /*** 
  * @Author: nexisato
  * @Date: 2024-02-27 08:43:40
- * @FilePath: /miracl_validation/src/test_acc.cpp
+ * @FilePath: /miracl_validation/test/test_acc.cpp
  * @Description: 
  * @
  */
 #include "accumulator.h"
 #include <jsoncpp/json/json.h>
 
-
-miracl *mip = mirsys(_KEY_LEN_, 10);
+extern miracl *mip;
 
 void get_pid_from_json(const char *&path, std::vector<Big> &pids) {
     std::ifstream ifs(path);

@@ -21,22 +21,14 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "utils.h"
 #include <utility>
+#include "kgc.h"
 
-#include "miracl/ecn.h"
 
-using namespace std;
+extern miracl* mip;
 
-#ifndef MR_NOFULLWIDTH
-Miracl precision(300, 256);
-#else
-Miracl precision(50, MAXBASE);
-#endif
 
-miracl *mip = &precision;
-
-void strip(char *name) { /* strip off filename extension */
+void strip(char* name) { /* strip off filename extension */
     int i;
     for (i = 0; name[i] != '\0'; i++) {
         if (name[i] != '.') continue;
@@ -45,123 +37,27 @@ void strip(char *name) { /* strip off filename extension */
     }
 }
 
-class KGC {
-private:
-    Big s;
-public:
-    Big bits, p, a, b, q, x0, y0;
-    ECn Ppub;
-    ECn G;
-    explicit KGC(const char*& filename) {
-        ifstream common(filename);
-        mip->IOBASE = 10;
-        common >> bits;
-        mip->IOBASE = 16;
-        common >> p >> a >> b >> q >> x0 >> y0;
-        ecurve(a, b, p, MR_PROJECTIVE);
-        this->G = ECn(x0, y0);
-        irand(utils::get_seed());
-        this->s = rand(256, 2);
-        this->Ppub = s * G; // 不能换位
-        
-    }
-    std::pair<Big, Big> generate_partial_key(const std::string&);
 
-
-public:
-    void print_params() {
-        std::cout << "bits: " << bits << std::endl;
-        std::cout << "p: " << p << std::endl;
-        std::cout << "a: " << a << std::endl;
-        std::cout << "b: " << b << std::endl;
-        std::cout << "q: " << q << std::endl;
-        std::cout << "G: " << G << std::endl;
-        std::cout << "s: " << s << std::endl;
-        std::cout << "Ppub: " << Ppub << std::endl;
-    }
-
-};
-
-/**
- * @brief Hash function，string -> big number
-*/
-Big Hash(std::string& str) { /* compute hash function */
-    Big h;
-    sha256 sh;
-    shs256_init(&sh);
-    char *s = const_cast<char*>(str.c_str());
-    shs256_hash(&sh, s);
-    h = from_binary(20, s);
-    return h;
-}
 
 int main() {
+    mip->IOBASE = 16;
     const char* filename = "../secp256.ecs";
     KGC* kgc_ptr = new KGC(filename);
     kgc_ptr->print_params();
+
+    std::string pid_val = "123456";
+    std::pair<std::string, std::string> partial_key = kgc_ptr->generate_partial_key(pid_val);
+    std::cout << "d: " << partial_key.first << std::endl;
+    std::cout << "R: " << partial_key.second << std::endl;
+
+    // std::cout << "Ppub: " << kgc_ptr->Ppub << std::endl;
+    // std::string p2str = point2str(kgc_ptr->Ppub);
+
+    // std::cout << "Ppub-2-str: " << p2str << std::endl;
     
-    // ifstream common("../secp256.ecs"); /* construct file I/O streams */
-    // //ifstream public_key("public.ecs");
+    // ECn Ppub_recover = str2point(p2str);
+    // std::cout << "Ppub-recover: " << Ppub_recover << std::endl;
 
 
-
-    // ECn G, Pub;
-    // int bits, ep;
-    // Big a, b, p, q, x, y, v, u1, u2, r, s, h;
-    // char ifname[50], ofname[50];
-
-
-    // /* get public data */
-    // common >> bits;
-    // mip->IOBASE = 16;
-    // common >> p >> a >> b >> q >> x >> y;
-    // ecurve(a, b, p, MR_PROJECTIVE);
-    // G = ECn(x, y);
-    // /* get public key of signer */
-    // //public_key >> ep >> x;
-    // Pub = ECn(x, ep);  // decompress
-    //                    /* get message */
-
-    // std::cout << "p: " << p << std::endl;
-    // std::cout << "a: " << a << std::endl;
-    // std::cout << "b: " << b << std::endl;
-    // std::cout << "q: " << q << std::endl;
-    // // cout << "signed file = ";
-    // // cin.sync();
-    // // cin.getline(ifname, 13);
-    // // strcpy(ofname, ifname);
-    // // strip(ofname);
-    // // strcat(ofname, ".ecs");
-    // // message.open(ifname, ios::binary | ios::in);
-    // // if (!message) { /* no message */
-    // //     cout << "Unable to open file " << ifname << "\n";
-    // //     return 0;
-    // // }
-    // std::string message = "Hello World";
-    // h = Hash(message);
-
-    // std::cout << "h: " << h << std::endl;
-
-    // signature.open(ofname, ios::in);
-    // if (!signature) { /* no signature */
-    //     cout << "signature file " << ofname << " does not exist\n";
-    //     return 0;
-    // }
-    // signature >> r >> s;
-    // if (r >= q || s >= q) {
-    //     cout << "Signature is NOT verified\n";
-    //     return 0;
-    // }
-    // s = inverse(s, q);
-    // u1 = (h * s) % q;
-    // u2 = (r * s) % q;
-
-    // G = mul(u2, Pub, u1, G);
-    // G.get(v);
-    // v %= q;
-    // if (v == r)
-    //     cout << "Signature is verified\n";
-    // else
-    //     cout << "Signature is NOT verified\n";
     return 0;
 }
