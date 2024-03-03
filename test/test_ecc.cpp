@@ -23,6 +23,8 @@
 #include <string>
 #include <utility>
 #include "kgc.h"
+#include "process.h"
+#include <cassert>
 
 
 extern miracl* mip;
@@ -41,22 +43,26 @@ void strip(char* name) { /* strip off filename extension */
 
 int main() {
     mip->IOBASE = 16;
-    const char* filename = "../secp160.ecs";
-    KGC* kgc_ptr = new KGC(filename);
+    extern const char* ec_filename;
+    
+    // 1. Initialize KGC
+    KGC* kgc_ptr = new KGC(ec_filename);
     kgc_ptr->print_params();
 
-    std::string pid_val = "123456";
-    std::pair<std::string, std::string> partial_key = kgc_ptr->generate_partial_key(pid_val);
-    std::cout << "d: " << partial_key.first << std::endl;
-    std::cout << "R: " << partial_key.second << std::endl;
+    // 2. Generate partial key
+    std::string pid_val = "5158ee15ec9beeae6cfcb3c5728e4313";
+    std::pair<Big, ECn> partial_key = kgc_ptr->generate_partial_key(pid_val);
 
-    // std::cout << "Ppub: " << kgc_ptr->Ppub << std::endl;
-    // std::string p2str = point2str(kgc_ptr->Ppub);
+    // 3. Initialize Process
+    Process* process_ptr = new Process(pid_val, kgc_ptr->Ppub);
+    process_ptr->print_params();
 
-    // std::cout << "Ppub-2-str: " << p2str << std::endl;
-    
-    // ECn Ppub_recover = str2point(p2str);
-    // std::cout << "Ppub-recover: " << Ppub_recover << std::endl;
+   
+
+    // // 4. Generate full key
+    process_ptr->generate_full_key(partial_key);
+    std::cout << "X: " << point2str(process_ptr->public_key.first) << std::endl;
+    std::cout << "R: " << point2str(process_ptr->public_key.second) << std::endl;
 
 
     return 0;

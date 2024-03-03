@@ -8,28 +8,25 @@
 #include "kgc.h"
 
 extern miracl* mip;
+extern Big ec_p, ec_a, ec_b, ec_q, ec_x0, ec_y0;
+extern ECn ec_G;
 
 KGC::KGC(const char*& filename) {
-    ifstream common(filename);
-    mip->IOBASE = 10;
-    common >> bits;
-    mip->IOBASE = 16;
-    common >> p >> a >> b >> q >> x0 >> y0;
-    ecurve(a, b, p, MR_PROJECTIVE);
-    this->G = ECn(x0, y0);
+    init_ecc(filename);
     irand(utils::get_seed());
     this->s = rand(160, 2);
-    this->Ppub = s * G;  // 不能换位
+    this->Ppub = s * ec_G;  // 不能换位
 }
 
-std::pair<std::string, std::string> KGC::generate_partial_key(
-    const std::string& pid_val) {
+std::pair<Big, ECn> KGC::generate_partial_key( const std::string& pid_val) {
     Big r = rand(160, 2);
-    ECn R = r * G;
+    ECn R = r * ec_G;
 
     std::string h_input = pid_val + point2str(R) + point2str(Ppub);
     Big h = hash2big(h_input);
 
-    Big d = (s + h * r) % q;
-    return std::make_pair(big2str(d), point2str(R));
+    Big d = (s * h + r) % ec_q;
+    std::cout << "d_raw: " << d << std::endl;
+    std::cout << "R_raw: " << R << std::endl;
+    return std::make_pair(d, R);
 }

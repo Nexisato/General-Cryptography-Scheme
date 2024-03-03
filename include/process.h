@@ -10,6 +10,9 @@
 #include "utils.h"
 
 
+extern Big ec_bits, ec_p, ec_a, ec_b, ec_q, ec_x0, ec_y0;
+extern ECn ec_G;
+
 /**
 * @brief 
 * the payload of the signed msg
@@ -35,7 +38,7 @@ public:
     /**
      * @brief Process constructor
     */
-    explicit Process(const std::string& pid, const std::string& Ppub_str);
+    explicit Process(const std::string&, const ECn& Ppub);
     ~Process();
 
     /**
@@ -44,7 +47,7 @@ public:
      * PublicKey: (X, R)
      * SecretKey: (d, r)
     */
-    bool generate_full_key(const std::pair<std::string, std::string>& partial_key);
+    bool generate_full_key(const std::pair<Big, ECn>& partial_key);
 
     /**
      * @brief 消息签名
@@ -70,5 +73,16 @@ public:
      */
     bool verify(Payload &payload, const int nid, std::string &Ppub_hex,
                 std::string &acc_cur, std::string &N);
+
+#ifndef NDEBUG
+public:
+    void print_params() {
+        std::cout << "---------- Process Params -------------" << std::endl;
+        std::cout << "pid: " << pid << std::endl;
+        std::cout << "Ppub: " << Ppub << std::endl;
+        std::cout << "G: " << ec_G << std::endl;
+        std::cout << "==================" << std::endl;
+    }
+#endif
 };
 

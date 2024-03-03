@@ -12,7 +12,30 @@ Miracl precision(_MIR_ND_, _MIR_BASE_);
 #else
 Miracl precision(50, MAXBASE);
 #endif
-miracl* mip = &precision;
+
+
+miracl *mip = &precision;
+
+Big ec_bits, ec_p, ec_a, ec_b, ec_q, ec_x0, ec_y0;
+ECn ec_G;
+const char* ec_filename = "../secp160.ecs";
+
+
+void init_ecc(const char*& filename) {
+    ifstream common(filename);
+    if (!common) {
+        std::cerr << "Unexpected filename: " << filename << std::endl;
+        throw std::invalid_argument("File not found.");
+    }
+    mip->IOBASE = 10;
+    common >> ec_bits;
+    mip->IOBASE = 16;
+    common >> ec_p >> ec_a >> ec_b >> ec_q >> ec_x0 >> ec_y0;
+    ecurve(ec_a, ec_b, ec_p, MR_PROJECTIVE);
+    ec_G = ECn(ec_x0, ec_y0);
+}
+
+
 
 /**
  * @brief Hash a string to a number : default is 160 bit
@@ -76,15 +99,20 @@ Big str2big(const std::string& str) {
 std::string point2str(const ECn& P) {
     Big x, y;
     P.getxy(x, y);
-    std::string str = big2str(x) + big2str(y);
+    std::string str = big2str(x) + "," +  big2str(y);
     return str;
 }
 
-ECn str2point(const std::string& str) {
-    Big x, y;
-    int len = str.length() / 2;
-    x = str2big(str.substr(0, len));
-    y = str2big(str.substr(len, len));
-    ECn P(x, y);
-    return P;
-}
+//! [BUG NOT FIX]Convert a string to a point
+// ECn str2point(const std::string& str) {
+//     init_ecc(ec_filename);
+//     std::size_t pos = str.find(",");
+//     if (pos == std::string::npos) {
+//         throw std::invalid_argument("Invalid input string format. Expected format 'x,y' .");
+//     }
+//     Big x = str2big(str.substr(0, pos));
+//     Big y = str2big(str.substr(pos + 1));
+
+    
+//     return P;
+// }
