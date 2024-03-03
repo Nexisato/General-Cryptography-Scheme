@@ -15,6 +15,8 @@
 This implementation does not consider the `serialization` and `deserialization` problem, 
 all of the intermediate paramters are passed with the specific data structure, for I have not solved the I/O converter function :( 
 
+    - Not solving the ECn parmaters unmatch problem.
+
 
 
 ## References
