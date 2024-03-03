@@ -27,11 +27,7 @@ void get_pid_from_json(const char *&path, std::vector<Big> &pids) {
         char *pid_str = const_cast<char*>(item["pid"].asCString());
         utils::toUpperCase(pid_str);
 
-        std::cout << pid_str << std::endl;
-
-
         Big pid_val(pid_str);
-
         pids.push_back(pid_val);
     }
 }
@@ -59,17 +55,22 @@ int main() {
     std::cout << "[Timing]Register Time: " << utils::count_time(add_start, add_end)
               << " ms" << std::endl;
     
-    
+    std::cout << "acc_cur: " << acc_ptr->acc_cur << std::endl;
+    std::cout << "N (public key): " << acc_ptr->public_key << std::endl;
     // 3. verify_raw
     const int test_time = 1;
     auto verify_start = std::chrono::system_clock::now();
 
     for (int cnt = 0; cnt < test_time; ++cnt) {
         for (size_t i = 0; i < pids.size(); ++i) {
-            if (acc_ptr->verify_member(acc_ptr->wits[i], pids[i]))
-                std::cout << "verify success" << std::endl;
-            else
-                std::cout << "verify failed" << std::endl;
+            if (acc_ptr->verify_member(acc_ptr->wits[i], pids[i])) {
+                //std::cout << "verify success" << std::endl;
+                std::cout << "pid[" << i << "]: " << pids[i] << std::endl;
+                std::cout << "wit[" << i << "]: " << acc_ptr->wits[i] << std::endl;
+            }
+            else {
+                throw std::runtime_error("verify failed");
+            }
         }
     }
 
@@ -79,23 +80,23 @@ int main() {
               << " ms" << std::endl;
 
 
-    // 4. verify_powd
-    int order = 64;
-    auto pow_verify_start = std::chrono::system_clock::now();
+    // // 4. verify_powd
+    // int order = 64;
+    // auto pow_verify_start = std::chrono::system_clock::now();
 
-    for (int cnt = 0; cnt < test_time; ++cnt) {
-        for (size_t i = 0; i < pids.size(); ++i) {
-            if (acc_ptr->verify_member_hash(acc_ptr->wits[i], pids[i], order))
-                std::cout << "verify success" << std::endl;
-            else
-                std::cout << "verify failed" << std::endl;
-        }
-    }
+    // for (int cnt = 0; cnt < test_time; ++cnt) {
+    //     for (size_t i = 0; i < pids.size(); ++i) {
+    //         if (acc_ptr->verify_member_hash(acc_ptr->wits[i], pids[i], order))
+    //             std::cout << "verify success" << std::endl;
+    //         else
+    //             std::cout << "verify failed" << std::endl;
+    //     }
+    // }
 
-    auto pow_verify_end = std::chrono::system_clock::now();
+    // auto pow_verify_end = std::chrono::system_clock::now();
 
-    std::cout << "[Timing]Verify-Pown Time: " << utils::count_time(pow_verify_start, pow_verify_end) / (test_time * pids.size())
-              << " ms" << std::endl;
+    // std::cout << "[Timing]Verify-Pown Time: " << utils::count_time(pow_verify_start, pow_verify_end) / (test_time * pids.size())
+    //           << " ms" << std::endl;
 
 
     // // remove member

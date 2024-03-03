@@ -26,7 +26,5 @@ std::pair<Big, ECn> KGC::generate_partial_key( const std::string& pid_val) {
     Big h = hash2big(h_input);
 
     Big d = (s * h + r) % ec_q;
-    std::cout << "d_raw: " << d << std::endl;
-    std::cout << "R_raw: " << R << std::endl;
     return std::make_pair(d, R);
 }

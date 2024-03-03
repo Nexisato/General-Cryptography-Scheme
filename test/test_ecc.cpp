@@ -49,20 +49,47 @@ int main() {
     KGC* kgc_ptr = new KGC(ec_filename);
     kgc_ptr->print_params();
 
+    std::string acc_cur_str = "750E4617294DF0EA61655687E1EB86344796B2E2307D72BB2DE2597ED7B1A96C8DD5C4C0E6A33BC25FABDA9BE3656C7740F5CE1EFA979B7A1FBE474D51906443";
+    std::string N_str = "9004132579E3B70F00A2B9001EBCD637EA6F24A3C558418E1757A6A70A2413AAF88A70133C9164FEAD04B75116A6E6C66FC615962723A1075A31B06C6217A551";
+    
+    Big acc_cur = str2big(acc_cur_str);
+    Big N = str2big(N_str);
     // 2. Generate partial key
-    std::string pid_val = "5158ee15ec9beeae6cfcb3c5728e4313";
-    std::pair<Big, ECn> partial_key = kgc_ptr->generate_partial_key(pid_val);
+    std::string pid1_val = "5158EE15EC9BEEAE6CFCB3C5728E4313";
+    std::string wit1_str = "6DE372CC57FCA2BE0D1628985CCA7A5DE36932641840723337403F4DCA2DADE627B68AEEB26F54BD1146C936B56D2B637B8B02385FA3EE353125932B27894B80";
+    std::pair<Big, ECn> partial_key_pid1 = kgc_ptr->generate_partial_key(pid1_val);
 
+    const ECn PPub_common = kgc_ptr->Ppub;
     // 3. Initialize Process
-    Process* process_ptr = new Process(pid_val, kgc_ptr->Ppub);
-    process_ptr->print_params();
-
+    Process* process1_ptr = new Process(pid1_val, PPub_common);
+    process1_ptr->print_params();
    
 
-    // // 4. Generate full key
-    process_ptr->generate_full_key(partial_key);
-    std::cout << "X: " << point2str(process_ptr->public_key.first) << std::endl;
-    std::cout << "R: " << point2str(process_ptr->public_key.second) << std::endl;
+    // 4. Generate full key
+    process1_ptr->generate_full_key(partial_key_pid1);
+
+
+
+    // 5. sign msg
+    std::string msg = "hello world";
+    Big wit1 = str2big(wit1_str);
+    Payload payload = process1_ptr->sign(msg, wit1, N);
+
+    std::cout << "payload.ts: "  << payload.time_stamp << std::endl;
+
+
+    // 6. verify msg
+    std::string pid2_val = "12767B506EBEFBACAB00B1F080737958F";
+    std::string wit2_str = "6173AE6AABF81FBCA86549EF91DB0E4EE2AD84F8CE6DC48D747740FA16C874C6EB1D00B0D9283102C5FD0AE69453D46391C31C516A9E08BF823526BB6C2F22F7";
+
+    Process* process2_ptr = new Process(pid2_val, PPub_common);
+    process2_ptr->print_params();
+
+
+    std::pair<Big, ECn> partial_key_pid2 = kgc_ptr->generate_partial_key(pid2_val);
+    process2_ptr->generate_full_key(partial_key_pid2);
+
+    process2_ptr->verify(payload, acc_cur, N);
 
 
     return 0;
