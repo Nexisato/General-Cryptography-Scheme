@@ -41,7 +41,7 @@ void strip(char* name) { /* strip off filename extension */
 
 int main() {
     mip->IOBASE = 16;
-    const char* filename = "../secp256.ecs";
+    const char* filename = "../secp160.ecs";
     KGC* kgc_ptr = new KGC(filename);
     kgc_ptr->print_params();
 

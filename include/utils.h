@@ -8,6 +8,7 @@
 
 #pragma once
 #include <chrono>
+#include <ctime>
 #include <random>
 #include <cctype>
 #include <string>
@@ -25,6 +26,12 @@ namespace utils {
  * @return double / (unit):milliseconds
  */
 double count_time(chrono_time t0, chrono_time t1);
+
+
+/**
+ * @brief Get the Time Stamp in string format
+*/
+std::string get_time_stamp();
 
 /**
  * @brief Get the Seed object

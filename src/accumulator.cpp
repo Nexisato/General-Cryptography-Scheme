@@ -64,6 +64,18 @@ bool Accumulator::verify_member(const Big& wit, const Big& pid_val) {
         return rhs == acc_cur;
 }
 
+
+bool Accumulator::verify_member_hash(const Big& wit, const Big& pid_val, int order) {
+        Big rhs = pow(wit, pid_val, public_key);
+        Big extra = rand(order, 2);
+        
+        rhs = pow(rhs, extra, public_key);
+        Big acc_lhs = pow(acc_cur, extra, public_key);
+
+        return acc_lhs == rhs;
+}
+
+
 Big Accumulator::remove_member(const Big& pid_val) {
         if (!is_contained(pid_val)) {
             std::cerr << "The member is not in the accumulator" << std::endl;

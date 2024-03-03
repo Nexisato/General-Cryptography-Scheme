@@ -27,8 +27,7 @@ public:
     /**
      * @brief generate partial key
     */
-    std::pair<std::string, std::string> generate_partial_key(const std::string& );
-
+    std::pair<std::string, std::string> generate_partial_key(const std::string&);
 
 
 #ifndef NDEBUG

@@ -60,7 +60,7 @@ int main() {
               << " ms" << std::endl;
     
     
-    // 3. verify
+    // 3. verify_raw
     const int test_time = 1;
     auto verify_start = std::chrono::system_clock::now();
 
@@ -73,49 +73,67 @@ int main() {
         }
     }
 
-
     auto verify_end = std::chrono::system_clock::now();
 
-    std::cout << "[Timing]Verify Time: " << utils::count_time(verify_start, verify_end)
+    std::cout << "[Timing]Verify Time: " << utils::count_time(verify_start, verify_end) / (test_time * pids.size())
               << " ms" << std::endl;
 
 
-    // remove member
-    std::vector<Big> remove_pids;
-    remove_pids.push_back(pids[0]);
-    remove_pids.push_back(pids[1]);
-
-    for (auto &pid : remove_pids) {
-        std::cout << "remove pid: " << pid << std::endl;
-    }
-    Big aux = acc_ptr->remove_members(remove_pids);
-    acc_ptr->update_witness(aux);
-
-    std::cout << "Current Wits.size(): " << acc_ptr->wits.size() << std::endl;
-    std::cout << "====================" << std::endl;
-
-
-    // 5. reverify
-    auto reverify_start = std::chrono::system_clock::now();
-
+    // 4. verify_powd
+    int order = 64;
+    auto pow_verify_start = std::chrono::system_clock::now();
 
     for (int cnt = 0; cnt < test_time; ++cnt) {
-        for (size_t i = 0; i < acc_ptr->wits.size(); ++i) {
-            if (acc_ptr->verify_member(acc_ptr->wits[i], pids[i + 2]))
+        for (size_t i = 0; i < pids.size(); ++i) {
+            if (acc_ptr->verify_member_hash(acc_ptr->wits[i], pids[i], order))
                 std::cout << "verify success" << std::endl;
             else
                 std::cout << "verify failed" << std::endl;
         }
     }
 
+    auto pow_verify_end = std::chrono::system_clock::now();
 
-    auto reverify_end = std::chrono::system_clock::now();
-    std::cout << "[Timing]Reverify Time: " << utils::count_time(reverify_start, reverify_end)
+    std::cout << "[Timing]Verify-Pown Time: " << utils::count_time(pow_verify_start, pow_verify_end) / (test_time * pids.size())
               << " ms" << std::endl;
 
 
+    // // remove member
+    // std::vector<Big> remove_pids;
+    // remove_pids.push_back(pids[0]);
+    // remove_pids.push_back(pids[1]);
 
-    mirexit();
+    // for (auto &pid : remove_pids) {
+    //     std::cout << "remove pid: " << pid << std::endl;
+    // }
+    // Big aux = acc_ptr->remove_members(remove_pids);
+    // acc_ptr->update_witness(aux);
+
+    // std::cout << "Current Wits.size(): " << acc_ptr->wits.size() << std::endl;
+    // std::cout << "====================" << std::endl;
+
+
+    // // 5. reverify
+    // auto reverify_start = std::chrono::system_clock::now();
+
+
+    // for (int cnt = 0; cnt < test_time; ++cnt) {
+    //     for (size_t i = 0; i < acc_ptr->wits.size(); ++i) {
+    //         if (acc_ptr->verify_member(acc_ptr->wits[i], pids[i + 2]))
+    //             std::cout << "verify success" << std::endl;
+    //         else
+    //             std::cout << "verify failed" << std::endl;
+    //     }
+    // }
+
+
+    // auto reverify_end = std::chrono::system_clock::now();
+    // std::cout << "[Timing]Reverify Time: " << utils::count_time(reverify_start, reverify_end)
+    //           << " ms" << std::endl;
+
+
+
+
 
     return 0;
 }

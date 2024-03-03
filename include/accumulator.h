@@ -16,7 +16,7 @@
 #include <utility>
 #include <cassert>
 
-#define _KEY_LEN_ 512
+#define _KEY_LEN_ 256
 
 
 class Accumulator {
@@ -61,6 +61,9 @@ public:
      * @brief verify if the pid in the current acc_val
     */
     bool verify_member(const Big& wit, const Big& pid_val);
+
+    // pow 256 bit
+    bool verify_member_hash(const Big& wit, const Big& pid_val, int order);
 
     /**
      * @brief remove a member from the accumulator

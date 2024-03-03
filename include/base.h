@@ -16,6 +16,8 @@
 
 #define _MIR_ND_ 2048
 #define _MIR_BASE_ 2
+#define _HASH_LEN_ 20
+#define _HASH256_LEN_ 32
 
 
 /**
@@ -23,6 +25,10 @@
  */
 Big hash2big(std::string& str);
 
+/**
+ * @brief hash function, sha256
+*/
+Big hash2big_256(std::string& str);
 
 /**
  * @brief big number -> string

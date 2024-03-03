@@ -23,12 +23,22 @@ set(ECC_PART
     src/utils.cpp
     src/base.cpp
     src/kgc.cpp
+    src/process.cpp
     test/test_ecc.cpp
 )
+
+
+set(BENCH_PART
+    src/utils.cpp
+    src/base.cpp
+    benchmark/bench_ecc.cpp
+)
+
 
 add_executable(${TARGET_NAME}
     #${ACCUMULATOR_PART}
     ${ECC_PART}
+    #${BENCH_PART}
 )
 
 

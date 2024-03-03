@@ -18,6 +18,14 @@ double count_time(chrono_time t0, chrono_time t1) {
     return res;
 }
 
+
+std::string get_time_stamp() {
+    auto now = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+    auto now_c = now.time_since_epoch().count();
+    return std::to_string(now_c); 
+}
+
+
 unsigned int get_seed() {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937_64 rng(seed);
