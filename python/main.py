@@ -11,7 +11,8 @@ from entity import Entity, Payload
 import utils
 from fastecdsa import curve, keys, point
 import gmpy2
-import datetime
+import time
+import secrets
 
 
 acc_cur: str = (
@@ -30,6 +31,7 @@ pid2: str = "5158ee15ec9beeae6cfcb3c5728e4313"
 def test_acc():
     rhs = gmpy2.powmod(utils.hex2int(wit1), utils.hex2int(pid1), utils.hex2int(N_str))
     return rhs == utils.hex2int(acc_cur)
+
 
 
 if __name__ == "__main__":
@@ -69,13 +71,23 @@ if __name__ == "__main__":
         print("public_key: ", entity1.public_key)
 
     # 4. Sign
+    threshold: int = 1000
+    sign_start = time.perf_counter()
     print("----------------- [4] Entity1 sign the msg -----------------")
-    msg1: str = "hello world"
-    payload1 = entity1.sign(msg1, utils.hex2int(wit1), utils.hex2int(N_str))
+    for _ in range(threshold):
+        msg1: str = secrets.token_hex(32)
+        payload1 = entity1.sign(msg1, utils.hex2int(wit1), utils.hex2int(N_str))
     # print("raw_wit1: ", utils.hex2int(wit1))
     # print("payload1: ", payload1.wit_new)
     #print("payload1.ti: ", payload1.time_stamp)
+    sign_end = time.perf_counter()
+    
+    print(f"[SignTime]: {utils.get_duration(sign_start, sign_end) / threshold} ms")
 
     # 5. Verify
     print("----------------- [5] Entity2 verify the msg -----------------")
-    entity2.verify(payload1, utils.hex2int(acc_cur), utils.hex2int(N_str))
+    verify_start = time.perf_counter()
+    for _ in range(threshold):
+        entity2.verify(payload1, utils.hex2int(acc_cur), utils.hex2int(N_str))    
+    verify_end = time.perf_counter()
+    print(f"[VerifyTime]: {utils.get_duration(verify_start, verify_end) / threshold} ms")

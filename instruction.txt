@@ -1,1 +1,0 @@
-g++ -O3 test.cpp -o test -I ./ -L ./ miracl.a
