@@ -123,7 +123,6 @@ class Entity:
             print("Payload Public Key Invalid")
             return False
 
-        
         lhs_last = gmpy2.powmod(payload.wit_new, utils.hex2int(payload.pid), N)
         rhs_last = gmpy2.powmod(acc_cur, ht, N)
 
@@ -133,5 +132,5 @@ class Entity:
             print("Payload Witness Invalid")
             return False
 
-        #print("Verify Success")
+        # print("Verify Success")
         return True

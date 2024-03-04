@@ -23,7 +23,7 @@ N_str: str = (
 )
 pid1: str = "197b4c349c9e1a426383f09ba576249cb"
 wit1: str = (
-   "0xf799337dc827f9aa6e4fb3c082adf5f5d177fc7f727b960d50d25228e7aac00f524dbfef3f08784cc3293e12dead55a2a0899fbdf9e37b8404dd920f8e1bd5"
+    "0xf799337dc827f9aa6e4fb3c082adf5f5d177fc7f727b960d50d25228e7aac00f524dbfef3f08784cc3293e12dead55a2a0899fbdf9e37b8404dd920f8e1bd5"
 )
 pid2: str = "5158ee15ec9beeae6cfcb3c5728e4313"
 
@@ -33,10 +33,9 @@ def test_acc():
     return rhs == utils.hex2int(acc_cur)
 
 
-
 if __name__ == "__main__":
 
-    #print("acc: ", test_acc())
+    # print("acc: ", test_acc())
 
     # 1. Initialize KGC
     kgc = KGC()
@@ -79,15 +78,17 @@ if __name__ == "__main__":
         payload1 = entity1.sign(msg1, utils.hex2int(wit1), utils.hex2int(N_str))
     # print("raw_wit1: ", utils.hex2int(wit1))
     # print("payload1: ", payload1.wit_new)
-    #print("payload1.ti: ", payload1.time_stamp)
+    # print("payload1.ti: ", payload1.time_stamp)
     sign_end = time.perf_counter()
-    
+
     print(f"[SignTime]: {utils.get_duration(sign_start, sign_end) / threshold} ms")
 
     # 5. Verify
     print("----------------- [5] Entity2 verify the msg -----------------")
     verify_start = time.perf_counter()
     for _ in range(threshold):
-        entity2.verify(payload1, utils.hex2int(acc_cur), utils.hex2int(N_str))    
+        entity2.verify(payload1, utils.hex2int(acc_cur), utils.hex2int(N_str))
     verify_end = time.perf_counter()
-    print(f"[VerifyTime]: {utils.get_duration(verify_start, verify_end) / threshold} ms")
+    print(
+        f"[VerifyTime]: {utils.get_duration(verify_start, verify_end) / threshold} ms"
+    )
