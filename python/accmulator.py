@@ -3,6 +3,8 @@ import secrets
 from typing import List, Tuple
 from sympy import nextprime
 import gmpy2
+import time
+import json
 
 BITS = 256
 
@@ -76,6 +78,7 @@ class Accumulator:
             i += 1
         self.pids.pop(i)
         self.wits.pop(i)
+        
     
     def remove_member(self, pid: str) -> int:
         """移出成员，返回相应的更新值"""
@@ -90,25 +93,89 @@ class Accumulator:
          
         return aux
     
+    
+    def remove_member_list(self, pids: List[str]) -> int:
+        """移出列表中的成员，返回相应的更新值"""
+        isEffective: bool = True
+        X: int = 1
+        for pid in pids:
+            if pid not in self.pids:
+                isEffective = False
+                break
+            X *= utils.hex2int(pid)
+        if isEffective is False:
+            raise ValueError("pid not in the member list")
+        euler_pk: int = (self.secret_key[0] - 1) * (self.secret_key[1] - 1)
+        aux: int = gmpy2.invert(X, euler_pk)
+        self.acc_cur = gmpy2.powmod(self.acc_cur, aux, self.N)
+        
+        for pid in pids:
+            self.remove_element_by_pid(pid)
+        
+        return aux
+        
+        
+    def witness_update(self, aux: int):
+        """更新剩余成员的证据值"""
+        for i, wit_val in enumerate(self.wits):
+            self.wits[i] = gmpy2.powmod(wit_val, aux, self.N) 
+            
+    def write_json(self, file_path: str):
+        """写入json文件"""
+        output: dict = {}
+        output["N"] = utils.int2hex(self.N)
+        output["G"] = utils.int2hex(self.G)
+        output["acc_cur"] = utils.int2hex(self.acc_cur)
+        
+        output["pids"] = []
+        
+        for i, pid in enumerate(self.pids):
+            output["pids"].append({"pid": pid, "wit": utils.int2hex(self.wits[i])})
+            
+        
+        with open(file_path, "w") as f:
+            json.dump(output, f, indent=4)
 
 
-if __name__ == "__main__":
-    acc = Accumulator()
-    acc.setup()
 
-    print(acc.N)
-    print(acc.secret_key)
-    print(acc.G)
+# if __name__ == "__main__":
+#     acc = Accumulator()
+#     acc.setup()
 
-    file_path = "./assets.json"
-    pids: list = utils.load_from_json(file_path)
-    for pid in pids:
-        acc.add_member(pid)
+#     print(acc.N)
+#     print(acc.secret_key)
+#     print(acc.G)
 
-    acc.witness_generate_all()
+#     file_path = "./assets.json"
+#     pids: list = utils.load_from_json(file_path)
+#     for pid in pids:
+#         acc.add_member(pid)
 
-    for pid, wit in zip(acc.pids, acc.wits):
-        print("pid: ", utils.hash2int(pid))
-        print("wit: ", wit)
-        print("verify: ", acc.verify_member(pid, wit))
-        print("-------------------------------")
+#     acc.witness_generate_all()
+
+#     verify_start = time.perf_counter()
+
+#     for pid, wit in zip(acc.pids, acc.wits):
+#         print("pid: ", pid)
+#         print("wit: ", hex(wit))
+#         print("verify: ", acc.verify_member(pid, wit))
+#         print("-------------------------------")
+    
+#     verify_end = time.perf_counter()
+#     print(f'[Time] verify: {utils.get_duration(verify_start, verify_end) / len(pids)} ms')
+    
+#     print("acc_cur: ", hex(acc.acc_cur))    
+    # pid_remove: str = pids[0]
+    
+    
+    
+    # aux = acc.remove_member(pid_remove)
+    # print("remove member: ", pid_remove)
+    # acc.witness_update(aux)
+    
+    # for pid, wit in zip(acc.pids, acc.wits):
+    #     print("pid: ", pid)
+    #     print("wit: ", wit)
+    #     print("verify: ", acc.verify_member(pid, wit))
+    #     print("-------------------------------")
+    

@@ -62,7 +62,7 @@ class Entity:
         ti: str = utils.get_time_stamp()
         ht: int = utils.hash256Function2int(ti)
 
-        wit_new: int = (wit ^ ht) % N
+        wit_new: int = gmpy2.powmod(wit, ht, N)
 
         y1: int = secrets.randbelow(self.ec_q)
         Y1: point.Point = y1 * self.ec_P
@@ -123,9 +123,7 @@ class Entity:
             print("Payload Public Key Invalid")
             return False
 
-        # lhs_last: int = (payload.wit_new ** utils.hex2int(payload.pid)) % N
-        # rhs_last: int = (acc_cur ** ht) % N
-
+        
         lhs_last = gmpy2.powmod(payload.wit_new, utils.hex2int(payload.pid), N)
         rhs_last = gmpy2.powmod(acc_cur, ht, N)
 

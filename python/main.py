@@ -15,36 +15,26 @@ import datetime
 
 
 acc_cur: str = (
-    "16d09945c33747913fddf4ddb8fc0fe9548676ea060f47901d8acdc35e7476637fdcba2cb3d71fe0b09848c77ba82579b39b39a754d4d86d2031797dae92a40f"
+    "0x529b91b217ad52c99489ee4a3ea3c8687ea6ac84e3c2361b365936ba9c51d8686756cabe4f3271a330265ead3c6a8a14369eef709c0d8b453f8233e81cd066"
 )
 N_str: str = (
-    "256ab0535223b7f396e9a83baf495485643f53fe0b169abbf9c65f319a90f11fd9d6e742bc96511164a482acad9fbd3436908ab81b80ec400738175539d10e11"
+    "0x20dcf162a31f29d02c211f16718b5576249272d77cf0de8f9f8751d8ee8e0887a3a109800174ee1dcb3a6da7447a2a1c01db86db98e80c8eb567eefdc08d55f"
 )
-pid1: str = "5158ee15ec9beeae6cfcb3c5728e4313"
+pid1: str = "197b4c349c9e1a426383f09ba576249cb"
 wit1: str = (
-    "7154a3d17795d52ffb0e22f3d34c01c4134c544f3367f208f2d6c80dd6750128bfe7f672a642a9c4a3ed644543330467e8751f3b2a80e53ca978f3a74aca0d4"
+   "0xf799337dc827f9aa6e4fb3c082adf5f5d177fc7f727b960d50d25228e7aac00f524dbfef3f08784cc3293e12dead55a2a0899fbdf9e37b8404dd920f8e1bd5"
 )
-pid2: str = "12767b506ebefbacab00b1f080737958f"
+pid2: str = "5158ee15ec9beeae6cfcb3c5728e4313"
 
 
-def hex2int(hex: str) -> int:
-    """convert hex string to int"""
-    return int(hex, 16)
-
-
-def test_acc(acc: str, pid: str, wit: str, N: str):
-
-    res = utils.quick_pow(wit, pid, N)
-    print("res: ", res)
-    acc_res = gmpy2.mpz(acc, 16)
-    print("acc: ", acc_res)
-
-    print("type of res: ", type(res))
+def test_acc():
+    rhs = gmpy2.powmod(utils.hex2int(wit1), utils.hex2int(pid1), utils.hex2int(N_str))
+    return rhs == utils.hex2int(acc_cur)
 
 
 if __name__ == "__main__":
 
-    # test_acc(acc_cur, wit1, pid1, N_str)
+    #print("acc: ", test_acc())
 
     # 1. Initialize KGC
     kgc = KGC()
@@ -84,7 +74,7 @@ if __name__ == "__main__":
     payload1 = entity1.sign(msg1, utils.hex2int(wit1), utils.hex2int(N_str))
     # print("raw_wit1: ", utils.hex2int(wit1))
     # print("payload1: ", payload1.wit_new)
-    print("payload1.ti: ", payload1.time_stamp)
+    #print("payload1.ti: ", payload1.time_stamp)
 
     # 5. Verify
     print("----------------- [5] Entity2 verify the msg -----------------")

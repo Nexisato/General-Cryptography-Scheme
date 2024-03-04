@@ -56,6 +56,18 @@ def get_time_stamp() -> str:
     """
     return str(int(time.time()))
 
+def get_duration(start_time: float, end_time: float) -> float:
+    """
+    Calculate the duration between two time points in milliseconds.
+    
+    Parameters:
+    start_time (float): The start time in seconds.
+    end_time (float): The end time in seconds.
+    
+    Returns:
+    float: The duration between start_time and end_time in seconds.
+    """
+    return (end_time - start_time) * 1000
 
 #! hexidecimal might cause wrong answer
 # def quick_pow_str(a: str, b: str, p: str):
