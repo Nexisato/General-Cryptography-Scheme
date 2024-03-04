@@ -3,12 +3,19 @@
 
 ## Environment
 - **OS**: Ubuntu22.04 (WSL2)
-- **Build**: CMake
 - **Architecture**: x86_64
-- **Dependencies**:
-    - MIRACL Cryptography Library
-    - jsoncpp
+- **C++ version (bug not fixed):**
+    - **Build**: CMake
+    - **Dependencies**:
+        - MIRACL Cryptography Library
+        - jsoncpp
 
+- **Python Version(Recommended):**
+    - **Dependencies**:
+        - gmpy2
+        - fastecdsa
+        - sympy
+        - cryptography
 
 
 ## Notes

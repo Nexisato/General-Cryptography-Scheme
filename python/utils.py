@@ -1,0 +1,91 @@
+"""
+Author: nexisato
+Date: 2024-03-04 11:34:36
+FilePath: /py_validation/utils.py
+Description: 定义一些密码学操作中常用的工具类函数
+
+"""
+
+import os
+import secrets
+from gmpy2 import powmod, mpz
+from fastecdsa import point
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+import time
+
+
+def hash_sha256(input: str) -> str:
+    """sha256 encoding sting to hex string"""
+    data: bytes = input.encode("utf-8")
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(data)
+    return digest.finalize().hex()
+
+
+def hex2int(hex: str) -> int:
+    """convert hex string to int"""
+    return int(hex, 16)
+
+
+def int2hex(val: int) -> str:
+    """convert int to hex string"""
+    return hex(val)
+
+
+def hash256Function2int(input: str) -> int:
+    """convert hash string to int"""
+    hash_val: str = hash_sha256(input)
+    return hex2int(hash_val)
+
+
+def get_bits(n: int) -> int:
+    """get the number of bits of a number"""
+    return n.bit_length()
+
+
+def point2hex(p: point.Point) -> str:
+    """convert point to hex string"""
+    return str(p.x) + str(p.y)
+
+
+def get_time_stamp() -> str:
+    """get the current time stamp
+    ---
+    use time.perf_counter() to record the time point
+    """
+    return str(int(time.time()))
+
+
+#! hexidecimal might cause wrong answer
+# def quick_pow_str(a: str, b: str, p: str):
+#     """ quick power calculation
+#     ---
+#     a^b mod p
+#     """
+#     a_mpz = mpz(a, 10)
+#     b_mpz = mpz(b, 10)
+#     p_mpz = mpz(p, 10)
+#     res = powmod(a_mpz, b_mpz, p_mpz)
+#     return res
+
+# def quick_pow_int(a: int, b: int, p: int) -> int:
+#     """ quick power calculation
+#     ---
+#     a^b mod p
+#     """
+#     res = powmod(a, b, p)
+#     return res
+
+
+def load_from_json(file_path: str) -> list:
+    """load pid list from json file"""
+    import json
+
+    with open(file_path, "r") as f:
+        data = json.load(f)
+
+    pids = []
+    for item in data["packages"]:
+        pids.append(item["pid"])
+    return pids
