@@ -16,6 +16,7 @@
         - fastecdsa
         - sympy
         - cryptography
+        - pypbc (bilinear pairing)
 
 
 ## Notes
@@ -30,3 +31,5 @@ all of the intermediate paramters are passed with the specific data structure, f
 - https://github.com/miracl/MIRACL
 - https://github.com/acherstyx/SM2-CPP-Implementation
 - [【Readme First】How To Compile C++ version MIRACL](https://adityagudimetla.medium.com/installing-miracl-for-dummies-7eb7192c3285)
+- https://github.com/Jemtaly/pypbc  (Recommended for Python >= 3.10)
+- https://github.com/AntonKueltz/fastecdsa
