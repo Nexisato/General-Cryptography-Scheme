@@ -1,14 +1,13 @@
 '''
 Author: nexisato
 Date: 2024-03-05 10:23:54
-FilePath: /miracl_validation/python/pairing-scheme.py
-Description: 基于双线性配对的密钥生成方案
+FilePath: /miracl_validation/python/pbc-pairing.py
+Description: pbc库实现-基于双线性配对的密钥生成方案
 '''
 
 import pypbc
 import utils
 from typing import List, Tuple
-import secrets
 import time
 
 PAIRING_PARAMETERS = (
