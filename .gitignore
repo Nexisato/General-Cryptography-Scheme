@@ -41,3 +41,9 @@
 **/ext_archive
 **/archive
 **/.cache
+
+# Ignore java class files and jar files and log files
+*.class
+*.jar
+*.log
+

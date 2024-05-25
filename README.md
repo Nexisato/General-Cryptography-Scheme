@@ -9,7 +9,6 @@
     - **Dependencies**:
         - MIRACL Cryptography Library
         - jsoncpp
-
 - **Python Version(Recommended):**
     - **Dependencies**:
         - gmpy2
@@ -18,6 +17,20 @@
         - cryptography
         - pymcl (bilinear pairing, safer and faster)
         - pypbc (bilinear pairing, NOT SAFE)
+- **Java Version (Useful for jpbc-API)**
+    - **Dependencies**
+        - bcprov-jdk16-1.46.jar
+        - Jama-1.0.3.jar
+        - jna-3.2.5.jar
+        - jpbc-api-2.0.0.jar
+        - jpbc-benchmark-2.0.0.jar
+        - jpbc-crypto-2.0.0.jar
+        - jpbc-mm-2.0.0.jar
+        - jpbc-pbc-2.0.0.jar
+        - jpbc-plaf-2.0.0.jar
+        - logback-classic-1.5.6.jar
+        - logback-core-1.5.6.jar
+        - slf4j-api-2.0.13.jar
 
 
 ## Notes
@@ -25,6 +38,8 @@ This implementation does not consider the `serialization` and `deserialization` 
 all of the intermediate paramters are passed with the specific data structure, for I have not solved the I/O converter function :( 
 
     - Not solving the ECn parmaters unmatch problem.
+
+For more complex pairing shchemes, we recommend JPBC with `Scheme` Abstract Base Class.
 
 
 
