@@ -1,8 +1,8 @@
-# RSA Accumulator-based-CLPKS Scheme
-> A prototype of Certificate Less Public Key Signature based on RSA Accumulator Scheme.
+# General-Cryptography-Scheme
+>  A prototype of General Cryptography Scheme Framework
 
 ## Environment
-- **OS**: Ubuntu22.04 (WSL2)
+- **OS**: Ubuntu22.04 (WSL2) / Windows (only for Java Development)
 - **Architecture**: x86_64
 - **C++ version (bug not fixed):**
     - **Build**: CMake
