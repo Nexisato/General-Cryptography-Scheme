@@ -8,9 +8,11 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import it.unisa.dia.gas.plaf.jpbc.util.ElementUtils;
 import java.io.*;
 
-public class CPAPE extends Scheme {
 
-    void init() {
+public class CPABE extends Scheme {
+    
+    @Override
+    public void init() {
         int rBit = 160;
         int qBit = 512;
         // Type A曲线
@@ -21,6 +23,8 @@ public class CPAPE extends Scheme {
         Pairing bp = PairingFactory.getPairing(typeAParams);
         System.out.println(typeAParams);
         // 从文件a.properties中读取参数初始化双线性群
+
+
 
     }
 }

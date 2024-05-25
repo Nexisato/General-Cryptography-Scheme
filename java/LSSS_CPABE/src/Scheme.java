@@ -4,6 +4,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
 public abstract class Scheme {
+    public abstract void init();
     /**
      * 
      * @methods: Static Get Element methods
