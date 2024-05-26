@@ -17,6 +17,7 @@
         - cryptography
         - pymcl (bilinear pairing, safer and faster)
         - pypbc (bilinear pairing, NOT SAFE)
+        - py_ecc (Recommended for Pair and ECDSA Demo)
 - **Java Version (Useful for jpbc-API)**
     - **Dependencies**
         - bcprov-jdk16-1.46.jar
@@ -31,6 +32,7 @@
         - logback-classic-1.5.6.jar
         - logback-core-1.5.6.jar
         - slf4j-api-2.0.13.jar
+        - guava-19.0.jar
 
 
 ## Notes
