@@ -4,7 +4,6 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
 public abstract class Scheme {
-    public abstract void init();
     /**
      * 
      * @methods: Static Get Element methods
@@ -71,42 +70,5 @@ public abstract class Scheme {
     public static Element transformFromGtToZp(Pairing pairInstance, Element pairing_result) {
         BigInteger pairing_params = pairing_result.toBigInteger();
         return pairInstance.getZr().newElement().set(pairing_params);
-    }
-
-    /**
-     * 
-     * @methods: Static Trasnfer methods
-     */
-    // 定义包含所有十六进制字符的数组
-    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-
-    // 16进制的byte[]数组转换为字符串
-    public static String hexBytesToString(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    // 16进制的字符串转换为byte[]数组
-    public static byte[] hexStringToBytes(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-        }
-        return data;
-    }
-
-    // 10进制数组转换为字符串
-    public static String intToString(int[] arr) {
-        StringBuilder sb = new StringBuilder();
-        for (int i : arr) {
-            sb.append(i);
-        }
-        return sb.toString();
     }
 }
