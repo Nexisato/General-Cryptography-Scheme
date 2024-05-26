@@ -8,8 +8,10 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import it.unisa.dia.gas.plaf.jpbc.util.ElementUtils;
 import java.io.*;
 import java.math.BigInteger;
-
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import Jama.Matrix;
+import java.util.Random;
 
 public class FSCPABE extends Scheme {
     TypeA1CurveGenerator pg = null;
@@ -39,8 +41,14 @@ public class FSCPABE extends Scheme {
         FSCPABE fscpabe = new FSCPABE();
         fscpabe.init(4, 32);
 
-        String S[] = { "A", "B", "C" };
+        String S[] = { "A", "B"};
         fscpabe.keygen(S);
+
+        LSSS lsss = new LSSS();
+        int tree[][] = lsss.initMatrix(3);
+        String plaintext = "hello";
+        fscpabe.encrypt(plaintext,tree.length,tree[0].length,tree);
+        fscpabe.decrypt();
 
     }
 
@@ -95,4 +103,89 @@ public class FSCPABE extends Scheme {
             this.Ki[i] = this.U[i].powZn(t).mul(Ri[i]).getImmutable();
         }
     }
+
+    public void encrypt(String plaintext, int line, int col, int[][] tree) {
+        long seed_val = Scheme.getRandomFromZp(this.pairing).toBigInteger().longValue();
+        Random seed = new Random(seed_val);
+        int[] secret = new int[col];
+        for (int i = 0; i < col; ++i) {
+            secret[i] = seed.nextInt();
+        }
+        int[] rand = new int[line];
+        for (int j = 0; j < line; ++j) {
+            rand[j] = seed.nextInt();
+        }
+        this.C1 = this.g.powZn(Zr.newElement(secret[0])).getImmutable();
+        this.Cx = new Element[line];
+        for (int i = 0; i < line; ++i) {
+            Cx[i] = (this.g.powZn(this.a.mul(Utils.multiVectorSum(tree[i], secret))))
+                    .mul(this.g.powZn(this.u[i].negate().mul(rand[i]))).getImmutable();
+        }
+        this.Dx = new Element[line];
+        for (int i = 0; i < line; i++) {
+            this.Dx[i] = this.g.duplicate().powZn(Zr.newElement(rand[i])).getImmutable();
+        }
+
+        byte[] plaintextBytes = plaintext.getBytes(StandardCharsets.UTF_8);
+        // 直接讲 byte[] 转换为 单个 GT 元素
+        Element[] plaintextToGt = new Element[plaintextBytes.length];
+        // TODO: 这里设定成一个，看后面能否改成多个
+        for (int i = 0; i < plaintextBytes.length;i++){
+            plaintextToGt[i] = GT.newElement(plaintextBytes[i]).getImmutable();
+            //Element paintextToGt = this.GT.newElementFromBytes(plaintextBytes).getImmutable();
+        }
+        this.C0 = new Element[plaintextBytes.length];
+        Element C0pre = this.egg.powZn(this.alpha.mul(secret[0])).getImmutable();
+
+        System.out.println("加密密文为 (长度 {})：" + C0.length);
+        for (int i = 0; i < C0.length; i++) {
+            this.C0[i] = C0pre.mul(plaintextToGt[i]).getImmutable();
+            System.out.println("C0: " + C0[i]);
+        }
+    }
+
+    public void decrypt() {
+        double[][] access = { { 0, 1 }, { -1, 1 }, { 0, 0 } };
+        // double[][] access =
+        // {{0,0,0,1},{0,-1,0,1},{0,1,0,0},{-1,0,0,1},{0,0,-1,0},{0,0,0,0},{0,0,0,0}};
+        // double[][] access =
+        // {{0,0,0,-1,0,0,0,1},{0,0,0,1,0,0,0,0},{0,-1,0,0,0,0,0,1},{0,1,0,1,0,-1,0,0},{0,0,0,0,0,1,0,1},{0,0,0,0,0,0,0,0,},{-1,0,0,0,0,0,0,0},{0,0,-1,0,0,0,0,0},{0,0,0,0,-1,0,0,0},{0,0,0,0,0,0,-1,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
+        // double[][] access =
+        // {{0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,1},{0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0},{0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,1},{0,0,0,1,0,0,0,1,0,0,0,-1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,-1,0,1,0,0,0,0,0,0,0,0,0,0,0,0},{0,1,0,0,0,-1,0,1,0,0,0,0,0,0,0,0},{0,0,0,0,0,1,0,0,0,-1,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,1,0,0,0,-1,0,1},{0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+
+        double[] w = solveMartix(access);
+        Element F = this.pairing.pairing(this.C1, this.K).getImmutable();
+        Element E = this.GT.newOneElement().getImmutable();
+        for (int i = 0; i < w.length; i++) {
+            int j = (int) w[i];
+            E = E.mul(this.pairing.pairing(this.Cx[i], this.L).mul(this.pairing.pairing(this.Dx[i], this.Ki[i])))
+                    .pow(BigInteger.valueOf(j)).getImmutable();
+        }
+        Element H = F.div(E).getImmutable();
+        Element[] M = new Element[this.C0.length];
+        for (int i = 0; i < this.C0.length; i++) {
+            M[i] = this.C0[i].div(H).getImmutable();
+        }
+        BigInteger[] recovPlaintext = new BigInteger[M.length];
+        int[] recovPlaintextFinal = new int[recovPlaintext.length];
+        System.out.println("解密后的明文为：");
+        for (int i = 0;i < M.length;i++){
+            recovPlaintext[i] =  M[i].toBigInteger();
+            recovPlaintextFinal[i]=recovPlaintext[i].intValue();
+            System.out.print((char)recovPlaintextFinal[i]);
+        }
+    }
+
+    public static double[] solveMartix(double[][] mat) {
+        Matrix m = new Matrix(mat);
+        double[] rho = new double[mat.length];
+        for (int i = 1; i < mat.length; i++) {
+            rho[i] = 0;
+        }
+        Matrix r = new Matrix(rho, rho.length);
+        Matrix w = m.solve(r);
+        double[] res = w.getColumnPackedCopy();
+        return res;
+    }
+
 }

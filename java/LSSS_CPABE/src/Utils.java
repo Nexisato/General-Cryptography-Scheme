@@ -70,7 +70,14 @@ public class Utils {
         }
         return res;
     }
-    
+
+    public static int multiVectorSum(int[] v, int[] w) {
+        int sum = 0;
+        for (int i = 0; i < v.length; i++) {
+            sum += v[i] * w[i];
+        }
+        return sum;
+    }
     /**
      * 
      * @methods: Static Trasnfer methods
