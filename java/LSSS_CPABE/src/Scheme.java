@@ -6,37 +6,6 @@ import it.unisa.dia.gas.jpbc.Pairing;
 public abstract class Scheme {
     /**
      * 
-     * @methods: Static Get Element methods
-     */
-
-    // G1中获取随机元素，获取1，获取0
-    public static Element getRandomFromG1(Pairing pairInstance) {
-        return pairInstance.getG1().newRandomElement().getImmutable();
-    }
-
-    public static Element getOneFromG1(Pairing pairInstance) {
-        return pairInstance.getG1().newOneElement().getImmutable();
-    }
-
-    public static Element getZeroFromG1(Pairing pairInstance) {
-        return pairInstance.getG1().newZeroElement().getImmutable();
-    }
-
-    // Zr中获取随机元素，获取1，获取0
-    public static Element getRandomFromZp(Pairing pairInstance) {
-        return pairInstance.getZr().newRandomElement().getImmutable();
-    }
-
-    public static Element getOneFromZp(Pairing pairInstance) {
-        return pairInstance.getZr().newOneElement().getImmutable();
-    }
-
-    public static Element getZeroFromZp(Pairing pairInstance) {
-        return pairInstance.getZr().newZeroElement().getImmutable();
-    }
-
-    /**
-     * 
      * @methods: Static Hash methods
      */
 

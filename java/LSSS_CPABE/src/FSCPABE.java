@@ -41,13 +41,13 @@ public class FSCPABE extends Scheme {
         FSCPABE fscpabe = new FSCPABE();
         fscpabe.init(4, 32);
 
-        String S[] = { "A", "B"};
+        String S[] = { "A", "B" };
         fscpabe.keygen(S);
 
         LSSS lsss = new LSSS();
         int tree[][] = lsss.initMatrix(3);
         String plaintext = "hello";
-        fscpabe.encrypt(plaintext,tree.length,tree[0].length,tree);
+        fscpabe.encrypt(plaintext, tree.length, tree[0].length, tree);
         fscpabe.decrypt();
 
     }
@@ -58,7 +58,7 @@ public class FSCPABE extends Scheme {
         System.out.println(typeA1Params);
         // e
         this.pairing = PairingFactory.getPairing(typeA1Params);
-        this.generator = Scheme.getRandomFromG1(pairing);
+        this.generator = this.pairing.getG1().newRandomElement().getImmutable();
         this.g = ElementUtils.getGenerator(this.pairing, this.generator, typeA1Params, 0, 3).getImmutable();
         // 私钥
         this.g3 = ElementUtils.getGenerator(this.pairing, this.generator, typeA1Params, 2, 3).getImmutable();
@@ -69,32 +69,34 @@ public class FSCPABE extends Scheme {
         this.Zr = pairing.getZr();
         // GxG->GT
         this.GT = pairing.getGT();
-        this.alpha = Scheme.getRandomFromZp(this.pairing);
-        this.a = Scheme.getRandomFromZp(this.pairing);
+        this.alpha = this.Zr.newRandomElement().getImmutable();
+        this.a = this.Zr.newRandomElement().getImmutable();
         // e(g,g)
         this.egg = pairing.pairing(g, g).getImmutable();
         // 为属性空间每个属性选取随机值
         this.u = new Element[attriNum];
         for (int i = 0; i < attriNum; i++) {
-            u[i] = Scheme.getRandomFromZp(pairing);
+            u[i] = this.Zr.newRandomElement().getImmutable();
         }
         this.U = new Element[attriNum];
         for (int i = 0; i < attriNum; i++) {
-            U[i] = g.powZn(u[i]).getImmutable();
+            U[i] = this.g.powZn(u[i]).getImmutable();
         }
 
     }
 
     public void keygen(String[] S) {
-        Element R = ElementUtils.getGenerator(this.pairing, this.generator, this.typeA1Params, 2, 3).getImmutable();
-        Element R1 = ElementUtils.getGenerator(this.pairing, this.generator, this.typeA1Params, 2, 3).getImmutable();
+        Element R = ElementUtils.getGenerator(this.pairing, this.generator,
+                this.typeA1Params, 2, 3).getImmutable();
+        Element R1 = ElementUtils.getGenerator(this.pairing, this.generator,
+                this.typeA1Params, 2, 3).getImmutable();
 
         Element[] Ri = new Element[S.length];
         for (int i = 0; i < S.length; i++) {
             Ri[i] = ElementUtils.getGenerator(this.pairing, this.generator, this.typeA1Params, 2, 3).getImmutable();
         }
 
-        Element t = Scheme.getRandomFromZp(this.pairing);
+        Element t = Zr.newRandomElement().getImmutable();
         this.K = this.g.powZn(this.alpha).mul(this.g.powZn(this.a.mul(t))).mul(R).getImmutable();
         this.L = this.g.powZn(t).mul(R1).getImmutable();
 
@@ -105,7 +107,7 @@ public class FSCPABE extends Scheme {
     }
 
     public void encrypt(String plaintext, int line, int col, int[][] tree) {
-        long seed_val = Scheme.getRandomFromZp(this.pairing).toBigInteger().longValue();
+        long seed_val = this.Zr.newRandomElement().toBigInteger().longValue();
         Random seed = new Random(seed_val);
         int[] secret = new int[col];
         for (int i = 0; i < col; ++i) {
@@ -126,17 +128,15 @@ public class FSCPABE extends Scheme {
             this.Dx[i] = this.g.duplicate().powZn(Zr.newElement(rand[i])).getImmutable();
         }
 
-        byte[] plaintextBytes = plaintext.getBytes(StandardCharsets.UTF_8);
-        // 直接讲 byte[] 转换为 单个 GT 元素
+        byte[] plaintextBytes = plaintext.getBytes();
         Element[] plaintextToGt = new Element[plaintextBytes.length];
-        // TODO: 这里设定成一个，看后面能否改成多个
-        for (int i = 0; i < plaintextBytes.length;i++){
+        for (int i = 0; i < plaintextBytes.length; i++) {
             plaintextToGt[i] = GT.newElement(plaintextBytes[i]).getImmutable();
-            //Element paintextToGt = this.GT.newElementFromBytes(plaintextBytes).getImmutable();
         }
-        this.C0 = new Element[plaintextBytes.length];
+        this.C0 = new Element[plaintextToGt.length];
         Element C0pre = this.egg.powZn(this.alpha.mul(secret[0])).getImmutable();
 
+        System.out.println("原始明文为 (长度 {})：" + plaintext.length() + " " + plaintext);
         System.out.println("加密密文为 (长度 {})：" + C0.length);
         for (int i = 0; i < C0.length; i++) {
             this.C0[i] = C0pre.mul(plaintextToGt[i]).getImmutable();
@@ -158,7 +158,8 @@ public class FSCPABE extends Scheme {
         Element E = this.GT.newOneElement().getImmutable();
         for (int i = 0; i < w.length; i++) {
             int j = (int) w[i];
-            E = E.mul(this.pairing.pairing(this.Cx[i], this.L).mul(this.pairing.pairing(this.Dx[i], this.Ki[i])))
+            E = E.mul(this.pairing.pairing(this.Cx[i],
+                    this.L).mul(this.pairing.pairing(this.Dx[i], this.Ki[i])))
                     .pow(BigInteger.valueOf(j)).getImmutable();
         }
         Element H = F.div(E).getImmutable();
@@ -169,16 +170,17 @@ public class FSCPABE extends Scheme {
         BigInteger[] recovPlaintext = new BigInteger[M.length];
         int[] recovPlaintextFinal = new int[recovPlaintext.length];
         System.out.println("解密后的明文为：");
-        for (int i = 0;i < M.length;i++){
-            recovPlaintext[i] =  M[i].toBigInteger();
-            recovPlaintextFinal[i]=recovPlaintext[i].intValue();
-            System.out.print((char)recovPlaintextFinal[i]);
+        for (int i = 0; i < M.length; i++) {
+            recovPlaintext[i] = M[i].toBigInteger();
+            recovPlaintextFinal[i] = recovPlaintext[i].intValue();
+            System.out.print((char) recovPlaintextFinal[i]);
         }
     }
 
     public static double[] solveMartix(double[][] mat) {
         Matrix m = new Matrix(mat);
         double[] rho = new double[mat.length];
+        rho[0] = 1;
         for (int i = 1; i < mat.length; i++) {
             rho[i] = 0;
         }
