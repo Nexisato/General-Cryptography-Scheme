@@ -173,8 +173,9 @@ public class FSCPABE extends Scheme {
         for (int i = 0; i < M.length; i++) {
             recovPlaintext[i] = M[i].toBigInteger();
             recovPlaintextFinal[i] = recovPlaintext[i].intValue();
-            System.out.print((char) recovPlaintextFinal[i]);
+            System.out.print((char)recovPlaintextFinal[i]);
         }
+        System.out.println();
     }
 
     public static double[] solveMartix(double[][] mat) {
