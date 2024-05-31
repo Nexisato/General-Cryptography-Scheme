@@ -10,7 +10,9 @@ from fastecdsa import point
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 import time
-
+import orjson
+from typing import Any, List
+from loguru import logger
 
 def hash_sha256(input: str) -> str:
     """sha256 encoding sting to hex string"""
@@ -53,6 +55,22 @@ def get_time_stamp() -> str:
     """
     return str(int(time.time()))
 
+
+def time_perf(func):
+    """decorator to calculate the duration of a function"""
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        res = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        duration = get_duration(start_time, end_time)
+        print(f"{func.__name__} | execution: {duration} ms")
+        if "threshold" in kwargs.keys():
+            avg_duration = duration / kwargs["threshold"]
+            print(f"{func.__name__} | average: {avg_duration} ms")
+        print()
+        return res
+    return wrapper
+
 def get_duration(start_time: float, end_time: float) -> float:
     """
     Calculate the duration between two time points in milliseconds.
@@ -87,12 +105,11 @@ def get_duration(start_time: float, end_time: float) -> float:
 #     return res
 
 
-def load_from_json(file_path: str) -> list:
+def load_from_json(file_path: str) -> List[Any]:
     """load pid list from json file"""
-    import json
 
-    with open(file_path, "r") as f:
-        data = json.load(f)
+    with open(file_path, "rb") as f:
+        data = orjson.loads(f.read())
 
     pids = []
     for item in data["packages"]:

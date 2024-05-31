@@ -36,6 +36,9 @@
 
 
 ## Notes
+
+- **2024-05-31**: update `time_perf` decorator in `utils.py` for better measurment
+
 This implementation does not consider the `serialization` and `deserialization` problem, 
 all of the intermediate paramters are passed with the specific data structure, for I have not solved the I/O converter function :( 
 
